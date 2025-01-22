@@ -81,31 +81,7 @@ npm run start-dev
 npm run start
 ```
 
-## Variabel Lingkungan
-Pastikan untuk mengatur variabel lingkungan berikut di file `.env` Anda:
-```
-# Konfigurasi Server
-HOST=localhost
-PORT=5000
 
-# Konfigurasi Database
-PGUSER=user_database_anda
-PGHOST=localhost
-PGPASSWORD=password_database_anda
-PGDATABASE=openmusicapi
-PGPORT=5432
-
-# JWT
-ACCESS_TOKEN_KEY=kunci_token_akses_anda
-REFRESH_TOKEN_KEY=kunci_token_refresh_anda
-ACCESS_TOKEN_AGE=1800
-```
-
-## Pengujian
-Jalankan suite pengujian:
-```bash
-npm run test
-```
 
 ## Struktur Proyek
 ```
@@ -122,12 +98,6 @@ npm run test
 └── package.json
 ```
 
-## Cara Berkontribusi
-1. Fork repositori
-2. Buat branch fitur Anda (`git checkout -b fitur/FiturKeren`)
-3. Commit perubahan Anda (`git commit -m 'Menambahkan FiturKeren'`)
-4. Push ke branch (`git push origin fitur/FiturKeren`)
-5. Buat Pull Request
 
 ## Lisensi
 Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](LICENSE) untuk detail.
