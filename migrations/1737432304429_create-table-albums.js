@@ -22,11 +22,11 @@ exports.up = (pgm) => {
       type: 'integer',
       notNull: true,
     },
-    created_at: {
+    createdat: {
       type: 'TEXT',
       notNull: true,
     },
-    updated_at: {
+    updatedat: {
       type: 'TEXT',
       notNull: true,
     },
@@ -39,5 +39,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-    pgm.dropTable('albums');
+  pgm.dropTable('albums');
 };

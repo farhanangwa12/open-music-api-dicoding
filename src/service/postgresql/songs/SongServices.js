@@ -15,7 +15,7 @@ class SongServices {
     const createdAt = new Date().toISOString();
     const updatedAt = createdAt;
     const query = {
-      text: 'INSERT INTO songs (id, title, year, performer, genre,  duration, album_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
+      text: 'INSERT INTO songs (id, title, year, performer, genre,  duration, albumid, createdat, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
       values: [id, title, year, performer, genre, duration, albumId, createdAt, updatedAt]
     };
 
@@ -56,7 +56,7 @@ class SongServices {
 
   async getSongById(id) {
     const query = {
-      text: 'SELECT id, title, year, performer, genre, duration, album_id FROM songs WHERE id = $1',
+      text: 'SELECT id, title, year, performer, genre, duration, albumid FROM songs WHERE id = $1',
       values: [id]
     };
 
@@ -70,7 +70,7 @@ class SongServices {
 
   async getSongByAlbum(idAlbum) {
     const query = {
-      text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
+      text: 'SELECT id, title, performer FROM songs WHERE albumid = $1',
       values: [idAlbum]
     };
 
@@ -86,7 +86,7 @@ class SongServices {
     const query = {
       text: `
         UPDATE songs
-        SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6, updated_at = $7
+        SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, albumid = $6, updatedat = $7
         WHERE id = $8
         RETURNING id
       `,

@@ -34,17 +34,17 @@ exports.up = (pgm) => {
       type: 'INTEGER',
       notNull: false, // Optional column
     },
-    album_id: {
+    albumid: {
       type: 'VARCHAR(50)',
       notNull: false, // Optional if the song is not tied to an album
       references: '"albums"',
       onDelete: 'CASCADE',
     },
-    created_at: {
+    createdat: {
       type: 'TEXT',
       notNull: true,
     },
-    updated_at: {
+    updatedat: {
       type: 'TEXT',
       notNull: true,
     },

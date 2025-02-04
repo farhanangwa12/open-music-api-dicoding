@@ -1,4 +1,4 @@
-const songByToDbModel = ({ id, title, year, performer, genre, duration, album_id
+const songByToDbModel = ({ id, title, year, performer, genre, duration, albumid
 }) => ({
   id: id,
   title: title,
@@ -6,7 +6,7 @@ const songByToDbModel = ({ id, title, year, performer, genre, duration, album_id
   performer: performer,
   genre: genre,
   duration: duration,
-  albumId: album_id
+  albumId: albumid
 });
 
 
