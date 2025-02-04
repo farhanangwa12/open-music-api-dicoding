@@ -49,7 +49,6 @@ class SongServices {
       text: `SELECT id, title, performer FROM songs ${finalQuery}`,
       values: conditionValue
     };
-    console.log('getSOng', query);
     const result = await this._pool.query(query);
     return result.rows;  // Mengembalikan array dari semua lagu
   }
