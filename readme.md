@@ -21,32 +21,6 @@ Open Music API adalah layanan API RESTful untuk manajemen musik yang dikembangka
 - Migrasi database menggunakan node-pg-migrate
 
 ## Dokumentasi API
-### Endpoint Autentikasi
-```
-POST /authentications
-PUT /authentications
-DELETE /authentications
-```
-
-### Endpoint Lagu
-```
-POST /songs
-GET /songs
-GET /songs/{songId}
-PUT /songs/{songId}
-DELETE /songs/{songId}
-```
-
-### Endpoint Playlist
-```
-POST /playlists
-GET /playlists
-DELETE /playlists/{playlistId}
-POST /playlists/{playlistId}/songs
-GET /playlists/{playlistId}/songs
-DELETE /playlists/{playlistId}/songs
-```
-
 ## Cara Instalasi
 
 1. Clone repositori ini
