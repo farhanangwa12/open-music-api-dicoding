@@ -136,7 +136,7 @@ const init = async () => {
 
       const errorResponse = h.response({
         status: 'fail',
-        message: response.output.message
+        message: response.output.payload.message
       });
       errorResponse.code(401);
       return errorResponse;

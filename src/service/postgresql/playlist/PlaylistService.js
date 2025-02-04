@@ -27,11 +27,12 @@ class PlaylistService {
   async getPlaylist(owner) {
 
     const query =
-     { text: `SELECT playlists.id, playlists.name, users.username FROM playlists
+    {
+      text: `SELECT playlists.id, playlists.name, users.username FROM playlists
               LEFT JOIN users ON users.id = playlists.owner 
-              LEFT JOIN collabolators ON collabolators.playlistid = playlists.id
-              WHERE playlists.owner = $1 OR collabolators.userid = $1`,  values: [owner],
-     };
+              LEFT JOIN collaborations ON collaborations.playlistid = playlists.id
+              WHERE playlists.owner = $1 OR collaborations.userid = $1`, values: [owner],
+    };
     const result = await this._pool.query(query);
 
     return result.rows;
@@ -50,13 +51,18 @@ class PlaylistService {
   }
 
 
+
+  async verifyPlaylistOwner(id, owner) {
+    const result = await this.playlistById(id);
+    const { owner: ownerPlaylist } = result.rows[0];
+    if (ownerPlaylist !== owner) {
+      throw new AuthorizationError('Anda tidak berhak terhadap resource ini.');
+    }
+  }
+
   async verifyPlaylistAccess(id, owner) {
     try {
-      const result = await this.playlistById(id);
-      const { owner: ownerPlaylist } = result.rows[0];
-      if (ownerPlaylist !== owner) {
-        throw new AuthorizationError('Anda tidak berhak terhadap resource ini.');
-      }
+      await this.verifyPlaylistOwner(id, owner);
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -93,15 +99,27 @@ class PlaylistService {
   }
 
   async getSongFromPlaylist(id) {
-    const query = {
+    const queryPlaylist = {
+      text: `SELECT playlists.id, playlists.name, users.username FROM playlists 
+             LEFT JOIN users ON users.id = playlists.owner
+             WHERE playlists.id = $1`,
+      values: [id]
+    };
+
+    const querySongs = {
       text: `SELECT songs.id, songs.title, songs.performer FROM songs
-      LEFT JOIN playlistsongs ON songs.id = playlistsongs.songid
-      WHERE playlistsongs.playlistid = $1`,
+             LEFT JOIN playlistsongs ON songs.id = playlistsongs.songid
+             WHERE playlistsongs.playlistid = $1`,
       values: [id],
     };
 
-    const result = await this._pool.query(query);
-    return result.rows;
+    const resultPlaylist = await this._pool.query(queryPlaylist);
+    const resultSongs = await this._pool.query(querySongs);
+
+    const playlist = resultPlaylist.rows[0];
+    playlist.songs = resultSongs.rows;
+
+    return playlist;
   }
 
 

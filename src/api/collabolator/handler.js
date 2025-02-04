@@ -4,13 +4,18 @@ class CollabolatorHandler {
     this._userService = userService;
     this._service = service;
     this._validator = validator;
+
+    this.postCollabolatorHandler = this.postCollabolatorHandler.bind(this);
+    this.deleteCollabolatorHandler = this.deleteCollabolatorHandler.bind(this);
   }
 
 
   async postCollabolatorHandler(request, h){
 
     const { playlistId, userId } = request.payload;
+    const { id: ownerId } = request.auth.credentials;
     await this._userService.userById(userId);
+    await this._playlistService.verifyPlaylistAccess(playlistId, ownerId);
     await this._playlistService.playlistById(playlistId);
     const id = await this._service.addCollabolator(playlistId, userId);
     const response = h.response({
@@ -26,8 +31,10 @@ class CollabolatorHandler {
   }
   async deleteCollabolatorHandler(request, h){
     const { playlistId, userId } = request.payload;
+    const { id: ownerId } = request.auth.credentials;
     await this._userService.userById(userId);
     await this._playlistService.playlistById(playlistId);
+    await this._playlistService.verifyPlaylistOwner(playlistId, ownerId);
     await this._service.deleteCollabolator(playlistId, userId);
     const response = h.response({
       status: 'success',

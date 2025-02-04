@@ -9,20 +9,24 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  pgm.createTable('collabolators', {
+  pgm.createTable('collaborations', {
     id: {
-      type: 'VARCHAR(20)',
+      type: 'VARCHAR(50)',
       primaryKey: true
     },
     playlistid: {
-      type: 'VARCHAR(20)',
+      type: 'VARCHAR(50)',
       notNull: true,
-      references: 'playlists(id)'
+      references: 'playlists(id)',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
     userid: {
-      type: 'VARCHAR(20)',
+      type: 'VARCHAR(50)',
       notNull: true,
-      references: 'users(id)'
+      references: 'users(id)',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     }
 
 
@@ -35,5 +39,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropTable('collaborators');
+  pgm.dropTable('collaborations');
 };

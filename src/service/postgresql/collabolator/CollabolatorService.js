@@ -9,9 +9,10 @@ class CollabolatorService {
   }
 
   async addCollabolator(playlistId, userId) {
-    const id = `collab-${nanoid(16)}`;
+    const id = `collab-${nanoid(12)}`;
+
     const result = await this._pool.query({
-      text: 'INSERT INTO collabolators (id, playlistid, userid) VALUES ($1, $2, $3) RETURNING id',
+      text: 'INSERT INTO collaborations  (id, playlistid, userid) VALUES ($1, $2, $3) RETURNING id',
       values: [id, playlistId, userId],
     });
     if (result.rows.length === 0) {
@@ -21,7 +22,7 @@ class CollabolatorService {
   }
   async verifyCollaboratorAccess(playlistId, userId) {
     const result = await this._pool.query({
-      text: 'SELECT id FROM collaborators WHERE playlistid = $1 AND userid = $2',
+      text: 'SELECT id FROM collaborations  WHERE playlistid = $1 AND userid = $2',
       values: [playlistId, userId],
     });
 
@@ -33,19 +34,18 @@ class CollabolatorService {
   }
 
 
-  async deleteCollabolator(collabolatorId) {
+  async deleteCollabolator(playlistId, userId) {
     // Add logic to delete a collabolator from the database
     // Example:
     const query = {
-      text: 'DELETE FROM collabolators WHERE id = $1 RETURNING id',
-      values: [collabolatorId],
+      text: 'DELETE FROM collaborations  WHERE playlistid = $1 AND userid = $2 RETURNING id',
+      values: [playlistId, userId],
     };
     const result = await this._pool.query(query);
 
     if (result.rows.length === 0) {
       throw new InvariantError('Collabolator gagal dihapus');
     }
-    return result.rows[0].id;
   }
 }
 

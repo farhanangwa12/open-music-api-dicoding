@@ -9,7 +9,7 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  pgm.createTable('playlist_activities', {
+  pgm.createTable('playlist_song_activities', {
     id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
@@ -53,5 +53,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropTable('playlist_activities');
+  pgm.dropTable('playlist_song_activities');
 };

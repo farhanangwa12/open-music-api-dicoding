@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const AuthenticationError = require('../../../exceptions/AuthenticationError');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../../exceptions/InvarianError');
+const NotFoundError = require('../../../exceptions/NotFoundError');
 class UsersService {
   constructor() {
     this._pool = new Pool();
@@ -38,7 +39,7 @@ class UsersService {
     };
     const result = await this._pool.query(query);
     if (!result.rows[0]) {
-      throw new InvariantError('Tidak dapat menemukan user');
+      throw new NotFoundError('Tidak dapat menemukan user');
     }
     return result;
   }

@@ -38,7 +38,7 @@ class AuthenticationHandler {
 
     const { refreshToken } = request.payload;
     const payload = await this._tokenManager.verifyRefreshToken(refreshToken);
-    // await this._authenticationService.verifyRefreshToken(refreshToken);
+    await this._authenticationService.verifyRefreshToken(refreshToken);
 
     const accessToken = this._tokenManager.generateAccessToken(payload.id);
 
