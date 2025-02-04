@@ -61,11 +61,11 @@ class SongServices {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Maaf lagu tidak ada');
     }
     // return result.rows[0];  // Mengembalikan lagu berdasarkan ID
-    return result.rows.map(songByToDbModel)[0];
+    return songByToDbModel(result.rows[0]);
   }
 
   async getSongByAlbum(idAlbum) {
