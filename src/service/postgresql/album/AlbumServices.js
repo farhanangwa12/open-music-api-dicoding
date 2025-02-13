@@ -35,21 +35,24 @@ class AlbumServices {
 
   }
 
-
-  // Get an album by ID
   async getAlbumById(id) {
 
     const query = {
-      text: 'SELECT id, name, year FROM albums WHERE id = $1',
+      text: 'SELECT id, name, year, cover as "coverUrl" FROM albums WHERE id = $1',
       values: [id]
     };
     const result = await this._pool.query(query);
     // return result.rows[0];
-    const resultAlbum = result.rows[0];
+    let resultAlbum = result.rows[0];
+
+
     if (!resultAlbum) {
       throw new NotFoundError('Maaf album yang anda cari tidak ada');
     }
-
+    if (resultAlbum.coverUrl !== null) {
+      const coverUrl = `http://${process.env.HOST}:${process.env.PORT}/upload/images/${resultAlbum.coverUrl}`;
+      resultAlbum = { ...resultAlbum, coverUrl: coverUrl };
+    }
     const songService = new SongServices(this._pool);
     const resultSongByAlbum = await songService.getSongByAlbum(id);
     return { ...resultAlbum, songs: resultSongByAlbum };
@@ -82,6 +85,26 @@ class AlbumServices {
     if (!result.rows.length) {
       throw new NotFoundError('Gagal menghapus album, id tidak ada');
     }
+  }
+
+  async updateCoverAlbum(id, cover) {
+    // Periksa apakah album dengan ID yang diberikan ada
+    const queryCheck = {
+      text: 'SELECT id FROM albums WHERE id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(queryCheck);
+
+    if (result.rowCount === 0) {
+      // Jika album tidak ditemukan, lemparkan NotFoundError
+      throw new NotFoundError('Maaf, album yang Anda cari tidak ditemukan');
+    }
+    // Jika album ditemukan, perbarui kolom cover
+    const queryUpdate = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2',
+      values: [cover, id],
+    };
+    await this._pool.query(queryUpdate);
   }
 }
 

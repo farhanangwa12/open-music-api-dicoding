@@ -4,3 +4,4 @@ node_modules
 package-lock.json
 open-music-api-v2.zip
 open-music-api-v2/*
+src/api/upload/file/images

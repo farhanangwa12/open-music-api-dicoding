@@ -1,5 +1,7 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
 
 const albumPlugin = require('./api/album');
 const AlbumServices = require('./service/postgresql/album/AlbumServices');
@@ -9,7 +11,10 @@ const SongServices = require('./service/postgresql/songs/SongServices');
 const SongValidator = require('./service/validator/song/index');
 const ClientError = require('./exceptions/ClientError');
 // const AuthorizationError = require('./exceptions/AuthorizationError');
-const Jwt = require('@hapi/jwt');
+
+
+
+
 
 const authentication = require('./api/authentication');
 const AuthenticationService = require('./service/postgresql/authentications/AuthenticationService');
@@ -31,6 +36,23 @@ const collabolator = require('./api/collabolator');
 const CollabolatorService = require('./service/postgresql/collabolator/CollabolatorService');
 const CollabolatorPayloadValidator = require('./service/validator/collabolator/index');
 
+const exporter = require('./api/export');
+const ExportService =  require('./service/rabbitmq/ExportService');
+const ExportValidator = require('./service/validator/export/index');
+
+
+const upload = require('./api/upload/index');
+const StorageService = require('./service/storage/StorageService');
+const UploadValidator = require('./service/validator/upload/index');
+
+const albumLike = require('./api/album_like');
+const AlbumLikeService = require('./service/postgresql/album_like/AlbumLIkeService');
+
+
+const CacheService = require('./service/redis/CacheService');
+const path = require('path');
+
+
 const init = async () => {
 
 
@@ -41,6 +63,10 @@ const init = async () => {
   const collabolatorService = new CollabolatorService();
   const playlistService = new PlaylistService(collabolatorService);
   const playlistActivitiesService = new PlaylistActivitiesService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/upload/file/images'));
+  const cacheService = new CacheService();
+  const albumLikeService = new AlbumLikeService(cacheService);
+
   const server = Hapi.server({
     host: process.env.HOST,
     port: process.env.PORT
@@ -51,7 +77,10 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt
-    }
+    },
+    {
+      plugin: Inert,
+    },
   ]);
 
   server.auth.strategy('open_music_jwt', 'jwt', {
@@ -114,6 +143,30 @@ const init = async () => {
           service: collabolatorService,
           validator: CollabolatorPayloadValidator
         }
+      },
+      {
+        plugin: exporter,
+        options: {
+          exportService: ExportService,
+          playlistService,
+          validator: ExportValidator
+        }
+      },
+      {
+        plugin: upload,
+        options: {
+          albumService,
+          storageService,
+          validator: UploadValidator
+        }
+      },
+      {
+        plugin: albumLike,
+        options: {
+          albumService,
+          userService,
+          service: albumLikeService,
+        }
       }
     ]
   );
@@ -130,23 +183,50 @@ const init = async () => {
       return errorResponse;
     }
 
-    if (response.isBoom && response.output.statusCode === 401) {
-      // Handle server error (500)
-      // Log actual error message to console
-
-      const errorResponse = h.response({
-        status: 'fail',
-        message: response.output.payload.message
-      });
-      errorResponse.code(401);
-      return errorResponse;
+    if (response.isBoom) {
+      switch (response.output.statusCode) {
+      case 401: {
+        const errorResponse = h.response({
+          status: 'fail',
+          message: response.output.payload.message
+        });
+        errorResponse.code(401);
+        return errorResponse;
+      }
+      case 404: {
+        const errorResponse = h.response({
+          status: 'fail',
+          message: response.output.payload.message
+        });
+        errorResponse.code(404);
+        return errorResponse;
+      }
+      case 413: {
+        const errorResponse = h.response({
+          status: 'fail',
+          message: response.output.payload.message
+        });
+        errorResponse.code(413);
+        return errorResponse;
+      }
+      case 415: {
+        const errorResponse = h.response({
+          status: 'fail',
+          message: response.output.payload.message
+        });
+        errorResponse.code(400);
+        return errorResponse;
+      }
+      case 500: {
+        console.error(response);
+        break;
+      }
+      default:
+        console.log(response);
+        break;
+      }
     }
 
-    if (response.isBoom && response.output.statusCode === 500) {
-      console.error(response);
-    }
-
-    // Mengembalikan response yang sudah ada
     return h.response(response);
   });
 
